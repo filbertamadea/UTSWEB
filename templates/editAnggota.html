@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <title>Edit Anggota</title>
+    </head>
+    <body>
+        <h2>Edit Anggota</h2>
+        <form method="post">
+            {{form.nim.label}} {{form.nim(readonly="readonly", value=data.NIM)}} <br/>
+            {{form.nama.label}} {{form.nama(readonly="readonly", value=data.Nama)}} <br/>
+            {{form.jurusan.label}} {{form.jurusan(readonly="readonly", value=data.Jurusan)}} <br/>
+            {{form.username.label}} {{form.username}} <br/>
+            {{form.password.label}} {{form.password}} <br/>
+            {{form.submit()}}
+        </form>
+    </body>
+</html>

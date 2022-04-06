@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <h2>Dashboard</h2>
+        <p>Welcome, {{name}}, below are the list of book!</p>
+        <a href="http://localhost:5000/editAnggota/{{nim}}">Edit Profil</a>
+        <h4>Book List</h4>
+        <table border="1">
+            <tr>
+                <th>Kode Buku</th>
+                <th>Judul Buku</th>
+                <th>Stok Buku</th>
+                <th>Pinjam</th>
+            </tr>
+            {% for buku in book_list %}
+            <tr>
+                <td>{{buku.KodeBuku}}</td>
+                <td>{{buku.Judul}}</td>
+                <td>{{buku.Stok}}</td>
+                <td>
+                    <form action="http://localhost:5000/pinjamBuku/{{buku.KodeBuku}}" method="post">
+                        <button type="submit" name="pinjam" class="btn-link">Pinjam</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h4>Your Borrow List</h4>
+        <table border="1">
+            <tr>
+                <th>Judul Buku</th>
+                <th>Tanggal Pinjam</th>
+                <th>Kembalikan</th>
+            </tr>
+            {% for buku in borrow_list %}
+            <tr>
+                <td>{{buku.Judul}}</td>
+                <td>{{buku.TglPinjam}}</td>
+                <td>                    
+                    <form action="http://localhost:5000/kembaliBuku/{{buku.KodeBuku}}" method="post">
+                        <button type="submit" name="kembali" class="btn-link">Kembalikan</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

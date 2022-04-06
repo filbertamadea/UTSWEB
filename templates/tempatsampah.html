@@ -1,0 +1,8 @@
+if request.method == 'POST' and 'Username' in request.form and 'Nama' in request.form and 'Jurusan' in request.form :
+            Username = request.form['Username']
+            Nama = request.form['Nama']
+            Jurusan = request.form['Jurusan']
+            cursor.execute('UPDATE INTO tb_anggota VALUES (% s, % s, % s)', (Username, Nama, Jurusan))
+            mysql.connection.commit()
+            msg = 'You have successfully registered !'
+            return render_template('account.html', tb_anggota=tb_anggota, msg = msg)

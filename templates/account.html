@@ -1,0 +1,24 @@
+{% extends "layoutlogin.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="login-wrap p-0">
+            <h1 style="text-align: center;">Update your Account</h1>
+                <form action="{{ url_for('account') }}" class="signin-form" method="post">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Username" name="Username" value="{{ tb_anggota.Username }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Nama Lengkap" name="Nama" value="{{ tb_anggota.Nama }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Jurusan" name="Jurusan" value="{{ tb_anggota.Jurusan }}">
+                    </div>
+                    <div class="msg">{{ msg }}</div>
+                    <div class="form-group">
+                        <button type="submit" class="form-control btn btn-primary submit px-3">Update</button>
+                    </div>
+            </form>
+    </div>
+</div>
+{% endblock content %}

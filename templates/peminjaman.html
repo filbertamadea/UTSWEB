@@ -1,0 +1,40 @@
+{% extends "layoutlogin.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row py-5">
+        <div class="col-lg-10 mx-auto">
+          <div class="card rounded shadow border-0">
+            <div class="card-body p-5 bg-white rounded">
+              <div class="table-responsive">
+                <table id="example" style="width:100%" class="table table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Kode Buku</th>
+                      <th>Judul Buku</th>
+                      <th>Stok Buku</th>
+                      <th>Pinjam</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for buku in book_list %}
+                    <tr>
+                        <td>{{buku.KodeBuku}}</td>
+                        <td>{{buku.Judul}}</td>
+                        <td>{{buku.Stok}}</td>
+                        <td>
+                            <form action="http://localhost:5000/pinjamBuku/{{buku.KodeBuku}}" method="post">
+                            <button type="submit" name="pinjam" class="btn-link">Pinjam</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+</div>
+{% endblock content %}
