@@ -40,7 +40,8 @@ def login():
             session['NIM'] = tb_anggota['NIM']
             session['Username'] = tb_anggota['Username']
             msg = 'Logged in successfully !'
-            return render_template('news.html',\
+            data = Anggota.query.filter_by(NIM = session['NIM']).first()
+            return render_template('news.html', tb_anggota=data,\
                                     dosen=app.config['DOSEN_TERCINTA'],\
                                     namakel=app.config['NAMA_KELOMPOK'],\
                                     namaweb=app.config['NAMA_WEB'], msg = msg)
@@ -82,8 +83,12 @@ def register():
 def news():
     # Check if user is loggedin
     if 'loggedin' in session:
+        data = Anggota.query.filter_by(NIM = session['NIM']).first()
         # User is loggedin show them the home page
-        return render_template('news.html', Username=session['Username'])
+        return render_template('news.html', tb_anggota=data, Username=session['Username'],\
+                                    dosen=app.config['DOSEN_TERCINTA'],\
+                                    namakel=app.config['NAMA_KELOMPOK'],\
+                                    namaweb=app.config['NAMA_WEB'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -106,8 +111,11 @@ def account():
                             """, (data.Username, data.nama, data.jurusan, data.Username))
             mysql.connection.commit()
             msg = 'Refresh untuk melihat perubahan!'
-            return render_template('account.html', tb_anggota=data, msg = msg)
-        return render_template('account.html', tb_anggota=data)
+            return render_template('account.html', tb_anggota=data, msg = msg, Username=session['Username'])
+        return render_template('account.html', tb_anggota=data,\
+                                    dosen=app.config['DOSEN_TERCINTA'],\
+                                    namakel=app.config['NAMA_KELOMPOK'],\
+                                    namaweb=app.config['NAMA_WEB'])
     # User is not loggedin redirect to login page
     else: return redirect(url_for('login'))
   
@@ -125,17 +133,22 @@ def peminjaman():
     #fetch user
     username = 'jsmith'
     user = Anggota.query.filter_by(Username = username).first()
+    data = Anggota.query.filter_by(NIM = session['NIM']).first()
     if user:
-        return render_template('peminjaman.html', name=user.Nama, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
+        return render_template('peminjaman.html', name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
     else:
         #shouldve render/redirect back to login but okay lol
-        return render_template('login.html')
+        return render_template('login.html', Username=session['Username'],\
+                                    dosen=app.config['DOSEN_TERCINTA'],\
+                                    namakel=app.config['NAMA_KELOMPOK'],\
+                                    namaweb=app.config['NAMA_WEB'])
 
 @app.route("/pengembalian",methods=['GET','POST'])
 def pengembalian():
         #fetch user
     username = 'jsmith'
     user = Anggota.query.filter_by(Username = username).first()
+    data = Anggota.query.filter_by(NIM = session['NIM']).first()
     if user:
         #join table
         results = db.session.query(M_Pinjam.NIM, Buku.Judul, Buku.KodeBuku, M_Pinjam.TglPinjam).\
@@ -143,10 +156,13 @@ def pengembalian():
             filter(M_Pinjam.NIM == user.NIM).all()
         for res in results:
             print(res.KodeBuku)
-        return render_template('pengembalian.html', name=user.Nama, nim=user.NIM, borrow_list=results)
+        return render_template('pengembalian.html', name=user.Nama, tb_anggota=data, nim=user.NIM, borrow_list=results,\
+                                    dosen=app.config['DOSEN_TERCINTA'],\
+                                    namakel=app.config['NAMA_KELOMPOK'],\
+                                    namaweb=app.config['NAMA_WEB'])
     else:
         #shouldve render/redirect back to login but okay lol
-        return render_template('login.html')
+        return render_template('login.html', Username=session['Username'], tb_anggota=data)
 
 # FUNCTIONALITY BUKU
 @app.route('/pinjamBuku/<KodeBuku>',methods=['GET','POST'])
@@ -232,21 +248,18 @@ def kembaliBuku(KodeBuku):
         return redirect(url_for('root'))
     return redirect(url_for('root'))
 
-#FUNCTIONALITY ANGGOTA (BELOM JALAN)
-@app.route('/editAnggota/<NIM>',methods=['GET','POST'])
-def editAnggota(NIM):
-    form = Registration()
-    data = Anggota.query.filter_by(NIM = NIM).first()
-
-    if request.method == 'POST':
-        #assign data from form to database
-        data.Username = form.username.data
-        data.Password = form.password.data
-        db.session.merge(data)
-        db.session.commit()
-        return redirect(url_for('index'))
-    else: 
-        return render_template('editAnggota.html', form = form, data = data)
+@app.route('/login/profil')
+def profil():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        data = Anggota.query.filter_by(NIM = session['NIM']).first()
+        return render_template('profil.html', Username=session['Username'], tb_anggota=data,\
+                                    dosen=app.config['DOSEN_TERCINTA'],\
+                                    namakel=app.config['NAMA_KELOMPOK'],\
+                                    namaweb=app.config['NAMA_WEB'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 
 if __name__ == '__name__':
     app.run(debug=True)

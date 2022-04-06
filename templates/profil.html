@@ -1,0 +1,29 @@
+{% extends "layoutlogin.html" %}
+{% block content %}
+<div class="row" style='margin-left:15%;'>
+    <div class="col-lg-6">
+        <div>
+            <h2>{{ tb_anggota.Nama }}</h2>
+            <h6>{{ tb_anggota.NIM }}</h6>
+            <br>
+        </div>
+        <div>
+            <h4>General Info</h4>
+            <table class="table table-hover">
+                <tr>
+                    <td><b>Jurusan</b></td>
+                    <td>{{ tb_anggota.Jurusan }}</td>
+                </tr>
+                <tr>
+                    <td><b>Username</b></td>
+                    <td>{{ tb_anggota.Username }}</td>
+                </tr>
+                <tr>
+                    <td><b>NIM</b></td>
+                    <td>{{ tb_anggota.NIM }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

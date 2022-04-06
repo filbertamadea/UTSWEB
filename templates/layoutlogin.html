@@ -31,7 +31,7 @@
                    {{dosen}}
                 </p>
                 <li>
-                    <a href="#">News & Event</a>
+                    <a href="{{url_for('news')}}">News</a>
                 </li>
                 <li class="active">
                     <a href="#akun" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Menu Buku</a>
@@ -46,7 +46,8 @@
                     <a href="#admin" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Menu Akun</a>
                     <ul class="collapse list-unstyled" id="admin">
                         <li>
-                            <a href="{{url_for('account')}}" class="form-inline my-2 my-lg-0 btn btn-secondary">Akun</a>
+                            <a href="{{url_for('profil')}}" class="form-inline my-2 my-lg-0 btn btn-secondary">{{ tb_anggota.Nama }}</a>
+                            <a href="{{url_for('account')}}" class="form-inline my-2 my-lg-0 btn btn-secondary">Update Account</a>
                             <a href="{{url_for('logout')}}" class="form-inline my-2 my-lg-0 btn btn-secondary">Logout</a>
                         </li>
                     </ul>
