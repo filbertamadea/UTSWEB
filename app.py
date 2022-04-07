@@ -140,8 +140,8 @@ def peminjaman():
                                                 namakel=app.config['NAMA_KELOMPOK'],\
                                                 namaweb=app.config['NAMA_WEB'], name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
         else:
-                    #shouldve render/redirect back to login but okay lol
-                    return render_template('login.html')
+                #shouldve render/redirect back to login but okay lol
+                return render_template('login.html')
     return render_template('login.html')
 
 @app.route("/pengembalian",methods=['GET','POST'])
@@ -170,7 +170,7 @@ def pengembalian():
 def pinjamBuku(KodeBuku):
     if 'loggedin' in session:
     #fetch user || USE SESSION INSTEAD
-        user = Anggota.query.filter_by(NIM = session['NIM']).first()
+        user = Anggota.query.filter_by(Username = session['Username']).first()
         
         #create date
         x = datetime.datetime.now()
