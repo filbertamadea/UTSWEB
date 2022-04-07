@@ -131,17 +131,18 @@ def logout():
 @app.route("/peminjaman",methods=['GET','POST'])
 def peminjaman():
     #fetch user
-    username = 'jsmith'
-    user = Anggota.query.filter_by(Username = username).first()
-    data = Anggota.query.filter_by(NIM = session['NIM']).first()
-    if user:
-        return render_template('peminjaman.html', Username=session['Username'],\
-                                    dosen=app.config['DOSEN_TERCINTA'],\
-                                    namakel=app.config['NAMA_KELOMPOK'],\
-                                    namaweb=app.config['NAMA_WEB'], name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
-    else:
-        #shouldve render/redirect back to login but okay lol
-        return render_template('login.html')
+    if 'loggedin' in session:
+        user = Anggota.query.filter_by(Username = session['Username']).first()
+        data = Anggota.query.filter_by(NIM = session['NIM']).first()
+        if user:
+                return render_template('peminjaman.html', Username=session['Username'],\
+                                                dosen=app.config['DOSEN_TERCINTA'],\
+                                                namakel=app.config['NAMA_KELOMPOK'],\
+                                                namaweb=app.config['NAMA_WEB'], name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
+        else:
+                    #shouldve render/redirect back to login but okay lol
+                    return render_template('login.html')
+    return render_template('login.html')
 
 @app.route("/pengembalian",methods=['GET','POST'])
 def pengembalian():
@@ -167,42 +168,43 @@ def pengembalian():
 # FUNCTIONALITY BUKU
 @app.route('/pinjamBuku/<KodeBuku>',methods=['GET','POST'])
 def pinjamBuku(KodeBuku):
+    if 'loggedin' in session:
     #fetch user || USE SESSION INSTEAD
-    user = Anggota.query.filter_by(Username = session['Username']).first()
-    
-    #create date
-    x = datetime.datetime.now()
+        user = Anggota.query.filter_by(NIM = session['NIM']).first()
+        
+        #create date
+        x = datetime.datetime.now()
 
-    #fetch last index INT
-    last_item = M_Pinjam.query.order_by(M_Pinjam.KodePinjam.desc()).first()
-    if last_item is not None:
-        last_item = last_item.KodePinjam 
+        #fetch last index INT
+        last_item = M_Pinjam.query.order_by(M_Pinjam.KodePinjam.desc()).first()
+        if last_item is not None:
+            last_item = last_item.KodePinjam 
 
-    #fetch targeted row from BUKU
-    buku = Buku.query.filter_by(KodeBuku=KodeBuku).first()
+        #fetch targeted row from BUKU
+        buku = Buku.query.filter_by(KodeBuku=KodeBuku).first()
 
-    #check if already borrow
-    check = True if (M_Pinjam.query.filter_by(NIM=user.NIM,KodeBuku=KodeBuku).first()) else False
-    
-    if request.method == 'POST' and check is not True:
-        #add data to tb_pinjam
-        KodePinjam = 1 if last_item is None else last_item+1
-        KodeBuku = KodeBuku
-        NIM = user.NIM
-        TglPinjam = x.strftime("%x")
-        pinjam = M_Pinjam(KodePinjam,KodeBuku,NIM,TglPinjam)
-        db.session.add(pinjam)
-        db.session.commit()
-        print("data added!")
+        #check if already borrow
+        check = True if (M_Pinjam.query.filter_by(NIM=user.NIM,KodeBuku=KodeBuku).first()) else False
+        
+        if request.method == 'POST' and check is not True:
+            #add data to tb_pinjam
+            KodePinjam = 1 if last_item is None else last_item+1
+            KodeBuku = KodeBuku
+            NIM = user.NIM
+            TglPinjam = x.strftime("%x")
+            pinjam = M_Pinjam(KodePinjam,KodeBuku,NIM,TglPinjam)
+            db.session.add(pinjam)
+            db.session.commit()
+            print("data added!")
 
-        #reduce stock on BUKU by 1
-        buku.Stok -= 1
-        db.session.merge(buku)
-        db.session.commit()
-        print("stock reduced!")
-        return redirect(url_for('peminjaman'))
-    else:
-        print("Kembalikan buku!")
+            #reduce stock on BUKU by 1
+            buku.Stok -= 1
+            db.session.merge(buku)
+            db.session.commit()
+            print("stock reduced!")
+            return redirect(url_for('peminjaman'))
+        else:
+            print("Kembalikan buku!")
     return redirect(url_for('peminjaman'))
 
 @app.route('/kembaliBuku/<KodeBuku>',methods=['GET','POST'])
