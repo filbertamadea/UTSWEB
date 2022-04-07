@@ -56,22 +56,22 @@ def login():
 def register():
     msg = ''
     if request.method == 'POST' and 'Username' in request.form and 'Password' in request.form and 'NIM' in request.form :
-        Username = request.form['Username']
-        Password = request.form['Password']
-        NIM = request.form['NIM']
-        Nama = request.form['Nama']
-        Jurusan = request.form['Jurusan']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM tb_anggota WHERE Username = % s', (Username, ))
+        Username = request.form['Username'] #Mengambil username dari form
+        Password = request.form['Password'] #Mengambil password dari form
+        NIM = request.form['NIM'] #Mengambil NIM dari form
+        Nama = request.form['Nama'] #Mengambil Nama Mahasiswa dari form
+        Jurusan = request.form['Jurusan'] #Mengambil Jurusan dari form
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor) #Select dengan cursor
+        cursor.execute('SELECT * FROM tb_anggota WHERE Username = % s', (Username, )) #execute cursor, seleksi dari tabel tb_anggota dengan username dari form yang telah diinput
         account = cursor.fetchone()
         if account:
-            msg = 'Account already exists !'
-        elif not re.match(r'[A-Za-z0-9]+', Username):
-            msg = 'Username must contain only characters and numbers !'
+            msg = 'Account already exists !' #pesan jika akun sudah ada
+        elif not re.match(r'[_A-z0-9]*((-|\s)*[_A-z0-9])*$', Username):
+            msg = 'Username must contain only characters and numbers !' #pesan jika username menggunakan simbol
         else:
-            cursor.execute('INSERT INTO tb_anggota VALUES (% s, % s, % s, % s, % s)', (NIM, Nama, Jurusan, Username, Password, ))
-            mysql.connection.commit()
-            msg = 'You have successfully registered !'
+            cursor.execute('INSERT INTO tb_anggota VALUES (% s, % s, % s, % s, % s)', (NIM, Nama, Jurusan, Username, Password, )) #jika data siap dimasukan kedalam database
+            mysql.connection.commit() 
+            msg = 'You have successfully registered !' #pesan bahwa sukses di register.
     elif request.method == 'POST':
         msg = 'Please fill out the form !'
     return render_template('register.html',\
@@ -140,18 +140,18 @@ def peminjaman():
                                                 namakel=app.config['NAMA_KELOMPOK'],\
                                                 namaweb=app.config['NAMA_WEB'], name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
         else:
-                #shouldve render/redirect back to login but okay lol
+                #Kembali ke login jika tidak login.
                 return render_template('login.html')
     return render_template('login.html')
 
 @app.route("/pengembalian",methods=['GET','POST'])
 def pengembalian():
         #fetch user
-    username = session['Username']
+    username = session['Username']  
     user = Anggota.query.filter_by(Username = username).first()
     print("user")
     print(user)
-    data = Anggota.query.filter_by(NIM = session['NIM']).first()
+    data = Anggota.query.filter_by(NIM = session['NIM']).first() #akses database melalui nim session yang sedang login.
     print("data")
     print(data)
     if user:
@@ -175,7 +175,8 @@ def pengembalian():
 def pinjamBuku(KodeBuku):
     if 'loggedin' in session:
     #fetch user || USE SESSION INSTEAD
-        user = Anggota.query.filter_by(Username = session['Username']).first()
+        username = session['Username']
+        user = Anggota.query.filter_by(Username = username).first()
         
         #create date
         x = datetime.datetime.now()
@@ -200,13 +201,13 @@ def pinjamBuku(KodeBuku):
             pinjam = M_Pinjam(KodePinjam,KodeBuku,NIM,TglPinjam)
             db.session.add(pinjam)
             db.session.commit()
-            print("data added!")
+            print("Buku", KodeBuku, "Sukses di pinjam", user.NIM)
 
             #reduce stock on BUKU by 1
             buku.Stok -= 1
             db.session.merge(buku)
             db.session.commit()
-            print("stock reduced!")
+            print("stock reduced! ")
             return redirect(url_for('peminjaman'))
         else:
             print("Kembalikan buku!")
@@ -215,43 +216,44 @@ def pinjamBuku(KodeBuku):
 @app.route('/kembaliBuku/<KodeBuku>',methods=['GET','POST'])
 def kembaliBuku(KodeBuku):
     #fetch user || USE SESSION INSTEAD
-    username = session['Username']
-    user = Anggota.query.filter_by(Username = username).first()
-    
-    #create date
-    x = datetime.datetime.now()
+    if 'loggedin' in session:
+        username = session['Username']
+        user = Anggota.query.filter_by(Username = username).first()
+        
+        #create date
+        x = datetime.datetime.now()
 
-    #fetch last index INT
-    last_item = M_Kembali.query.order_by(M_Kembali.KodeKembali.desc()).first()
-    if last_item is not None:
-        last_item = last_item.KodeKembali 
+        #fetch last index INT
+        last_item = M_Kembali.query.order_by(M_Kembali.KodeKembali.desc()).first()
+        if last_item is not None:
+            last_item = last_item.KodeKembali 
 
-    #fetch targeted row from BUKU
-    buku = Buku.query.filter_by(KodeBuku=KodeBuku).first()
+        #fetch targeted row from BUKU
+        buku = Buku.query.filter_by(KodeBuku=KodeBuku).first()
 
-    if request.method == 'POST':
-        #add data to tb_kembali
-        KodeKembali = 1 if last_item is None else last_item+1
-        KodeBuku = KodeBuku
-        NIM = user.NIM
-        TglKembali = x.strftime("%x")
-        kembali = M_Kembali(KodeKembali,KodeBuku,NIM,TglKembali)
-        db.session.add(kembali)
-        db.session.commit()
-        print("data added!")
+        if request.method == 'POST':
+            #add data to tb_kembali
+            KodeKembali = 1 if last_item is None else last_item+1
+            KodeBuku = KodeBuku
+            NIM = user.NIM
+            TglKembali = x.strftime("%x")
+            kembali = M_Kembali(KodeKembali,KodeBuku,NIM,TglKembali)
+            db.session.add(kembali)
+            db.session.commit()
+            print("Buku", KodeBuku, "Dikembalikan oleh", user.NIM)
 
-        #delete row from PINJAM
-        pinjam = M_Pinjam.query.filter_by(NIM=user.NIM, KodeBuku=KodeBuku).first()
-        db.session.delete(pinjam)
-        db.session.commit()
-        print("data deleted!")
+            #delete row from PINJAM
+            pinjam = M_Pinjam.query.filter_by(NIM=user.NIM, KodeBuku=KodeBuku).first()
+            db.session.delete(pinjam)
+            db.session.commit()
+            print("data deleted!")
 
-        #add stock on BUKU by 1
-        buku.Stok += 1
-        db.session.merge(buku)
-        db.session.commit()
-        print("stock added!")
-        return redirect(url_for('pengembalian'))
+            #add stock on BUKU by 1
+            buku.Stok += 1
+            db.session.merge(buku)
+            db.session.commit()
+            print("stock added!" )
+            return redirect(url_for('pengembalian'))
     return redirect(url_for('pengembalian'))
 
 @app.route('/login/profil')
