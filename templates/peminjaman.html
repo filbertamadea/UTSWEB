@@ -1,5 +1,8 @@
 {% extends "layoutlogin.html" %}
 {% block content %}
+{% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
 <div class="container py-5">
     <div class="row py-5">
         <div class="col-lg-10 mx-auto">
@@ -30,7 +33,6 @@
                     {% endfor %} 
                   </tbody>
                 </table>
-                <div class="msg">{{ msg }}</div>
               </div>
             </div>
           </div>

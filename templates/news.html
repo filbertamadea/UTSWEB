@@ -1,5 +1,24 @@
 {% extends "layoutlogin.html" %}
 {% block content %}
-<h1> NEWS</h1>
-<h1> {{session.Username}}</h1>
+<h1> Hi!! {{ tb_anggota.Nama }}</h1>
+<div class="Contenthome">
+    <hr>
+    <p><img src="{{ url_for('static', filename='img/home1.jpg') }}" alt="Sorry we can't display this image" style="width: 20%;">
+        <span style="padding-left: 10%; padding-top: 50px; padding-right: 50px;"> <br>
+            <span style="font-size: 30px; font-weight: bold;">Logika Pemograman Python</span> <br> Buku ini sangat cocok digunakan untuk pelajar, mahasiswa, atau siapa saja yang bermaksud untuk mempelajari pemrograman komputer dengan menggunakan bahasa Python. Buku ini lebih menekankan pada cara untuk menyelesaikan masalah. Oleh karena itu, banyak contoh permasalahan yang diberikan dan cara untuk menyelesaikannya.
+            Contoh-contoh yang cukup banyak dan bahasa yang mudah dipahami membuat buku ini sangat mudah digunakan dan dapat menjadi penuntun untuk belajar bahasa Python secara mandiri.
+        <br><u><a href="{{url_for('peminjaman')}}">Book Now!</a></u>
+        </span>
+    </p>
+    <hr>
+    <div class="news2">
+        <p> <img src="{{ url_for('static', filename='img/home2.jfif') }}" alt="Sorry we can't display this image" style="width: 20%;">
+            <span style="padding-left: 10%; padding-top: 100px; padding-right: 50px;"> <br>
+                <span style="font-size: 30px; font-weight: bold;">Pemograman Python (Teori dan Implementasi)</span> <br> Buku Python untuk menunjang libarary pemrograman di otak kalian, bagi yang ingin mendalami tentang pemrograman python, buku ini cocok sekali, untuk pemula, dan disajikan sangat baik. dari mulai dasar sampai mahir:D. cocok juga bagi yang sedang ngulik2 raspberry pi :D
+                isinya apa aja sih? Kegunaanya adalah Pengenalan Python, Dasar-dasar python, List, tuple ,set ,dictionary, Perulangan dan pengendalian kondisi
+            <br><u><a href="{{url_for('peminjaman')}}">Book Now!</a></u>
+            </span>
+        </p>
+    </div>
+</div>
 {% endblock content %}
