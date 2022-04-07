@@ -147,15 +147,20 @@ def peminjaman():
 @app.route("/pengembalian",methods=['GET','POST'])
 def pengembalian():
         #fetch user
-    username = 'jsmith'
+    username = session['Username']
     user = Anggota.query.filter_by(Username = username).first()
+    print("user")
+    print(user)
     data = Anggota.query.filter_by(NIM = session['NIM']).first()
+    print("data")
+    print(data)
     if user:
         #join table
         results = db.session.query(M_Pinjam.NIM, Buku.Judul, Buku.KodeBuku, M_Pinjam.TglPinjam).\
             join(Buku, Buku.KodeBuku == M_Pinjam.KodeBuku).\
             filter(M_Pinjam.NIM == user.NIM).all()
         for res in results:
+            print("from res kodebuku")
             print(res.KodeBuku)
         return render_template('pengembalian.html', name=user.Nama, tb_anggota=data, nim=user.NIM, borrow_list=results, Username=session['Username'],\
                                     dosen=app.config['DOSEN_TERCINTA'],\
@@ -210,7 +215,7 @@ def pinjamBuku(KodeBuku):
 @app.route('/kembaliBuku/<KodeBuku>',methods=['GET','POST'])
 def kembaliBuku(KodeBuku):
     #fetch user || USE SESSION INSTEAD
-    username = 'jsmith'
+    username = session['Username']
     user = Anggota.query.filter_by(Username = username).first()
     
     #create date
