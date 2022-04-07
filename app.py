@@ -111,7 +111,7 @@ def account():
                             """, (data.Username, data.nama, data.jurusan, data.Username))
             mysql.connection.commit()
             msg = 'Refresh untuk melihat perubahan!'
-            return render_template('account.html', tb_anggota=data, msg = msg, Username=session['Username'])
+            return render_template('account.html', tb_anggota=data, msg = msg, Username=session['Username']) 
         return render_template('account.html', tb_anggota=data,\
                                     dosen=app.config['DOSEN_TERCINTA'],\
                                     namakel=app.config['NAMA_KELOMPOK'],\
@@ -135,13 +135,13 @@ def peminjaman():
     user = Anggota.query.filter_by(Username = username).first()
     data = Anggota.query.filter_by(NIM = session['NIM']).first()
     if user:
-        return render_template('peminjaman.html', name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
-    else:
-        #shouldve render/redirect back to login but okay lol
-        return render_template('login.html', Username=session['Username'],\
+        return render_template('peminjaman.html', Username=session['Username'],\
                                     dosen=app.config['DOSEN_TERCINTA'],\
                                     namakel=app.config['NAMA_KELOMPOK'],\
-                                    namaweb=app.config['NAMA_WEB'])
+                                    namaweb=app.config['NAMA_WEB'], name=user.Nama, tb_anggota=data, nim=user.NIM, book_list=Buku.query.filter(Buku.Stok != 0).all())
+    else:
+        #shouldve render/redirect back to login but okay lol
+        return render_template('login.html')
 
 @app.route("/pengembalian",methods=['GET','POST'])
 def pengembalian():
@@ -156,7 +156,7 @@ def pengembalian():
             filter(M_Pinjam.NIM == user.NIM).all()
         for res in results:
             print(res.KodeBuku)
-        return render_template('pengembalian.html', name=user.Nama, tb_anggota=data, nim=user.NIM, borrow_list=results,\
+        return render_template('pengembalian.html', name=user.Nama, tb_anggota=data, nim=user.NIM, borrow_list=results, Username=session['Username'],\
                                     dosen=app.config['DOSEN_TERCINTA'],\
                                     namakel=app.config['NAMA_KELOMPOK'],\
                                     namaweb=app.config['NAMA_WEB'])
@@ -168,8 +168,7 @@ def pengembalian():
 @app.route('/pinjamBuku/<KodeBuku>',methods=['GET','POST'])
 def pinjamBuku(KodeBuku):
     #fetch user || USE SESSION INSTEAD
-    username = 'jsmith'
-    user = Anggota.query.filter_by(Username = username).first()
+    user = Anggota.query.filter_by(Username = session['Username']).first()
     
     #create date
     x = datetime.datetime.now()
@@ -201,10 +200,10 @@ def pinjamBuku(KodeBuku):
         db.session.merge(buku)
         db.session.commit()
         print("stock reduced!")
-        return redirect(url_for('root'))
+        return redirect(url_for('peminjaman'))
     else:
         print("Kembalikan buku!")
-    return redirect(url_for('root'))
+    return redirect(url_for('peminjaman'))
 
 @app.route('/kembaliBuku/<KodeBuku>',methods=['GET','POST'])
 def kembaliBuku(KodeBuku):
@@ -245,8 +244,8 @@ def kembaliBuku(KodeBuku):
         db.session.merge(buku)
         db.session.commit()
         print("stock added!")
-        return redirect(url_for('root'))
-    return redirect(url_for('root'))
+        return redirect(url_for('pengembalian'))
+    return redirect(url_for('pengembalian'))
 
 @app.route('/login/profil')
 def profil():
